@@ -1,59 +1,51 @@
-# library(gsm.app)
+library(gsm.app)
+library(fs)
+library(purrr)
+library(dplyr)
+source('R/DataIO.R')
+
 # library(gsm.ae)
-dfAnalysisInput <- lAnalysisData %>%
-    imap(~
-        .x$Analysis_Input %>%
-            mutate(MetricID = .y )
-    ) %>%
-    list_rbind()
+dfAnalysisInput <- ReadAnalysisData()
+
+dfBounds <- ReadData("Reporting", "Bounds")
+dfGroups <- ReadData("Reporting", "Groups")
+dfMetrics <- ReadData("Reporting", "Metrics")
+dfResults <- ReadData("Reporting", "Results")
+
+fetchData <- function(strDomain, strSiteID = NULL, strSubjectID = NULL) {
+  strDomain <- switch(strDomain, SUBJ = 'DM', STUDCOMP = 'DS', strDomain)
+  # Load data.
+  dfDomain <- ReadData("Mapped", strDomain) %>%
+    mutate(
+      SubjectID = USUBJID
+    )
+
+  # Subset on site ID, if given.
+  if (!is.null(strSiteID)) {
+    dfDomain <- dplyr::filter(dfDomain, .data$SITEID == strSiteID)
+  }
+
+  # Subset on subject ID, if given.
+  if (!is.null(strSubjectID)) {
+    dfDomain <- dplyr::filter(dfDomain, .data$USUBJID == strSubjectID)
+  }
+
+  return(dfDomain)
+}
 
 run_gsm_app(
-    dfAnalysisInput,
-    lReportingData$Reporting_Bounds,
-    lReportingData$Reporting_Groups,
-    lReportingData$Reporting_Metrics,
-    lReportingData$Reporting_Results,
-    function(
-        strDomain,
-        strSiteID = NULL,
-        strSubjectID = NULL
-    ) {
-        strDomain <- switch(strDomain,
-            SUBJ = 'DM',
-            STUDCOMP = 'DS',
-            strDomain
-        )
-        # Load data.
-        dfDomain <- file.path('data', 'Mapped', paste0(strDomain, '.rds')) %>%
-            readRDS() %>%
-            mutate(
-                SubjectID = USUBJID
-            )
-
-        # Subset on site ID, if available.
-        if (!is.null(strSiteID)) {
-            dfDomain <- dfDomain %>%
-                dplyr::filter(
-                    .data$SITEID == strSiteID
-                )
-        }
-
-        # Subset on subject ID, if available.
-        if (!is.null(strSubjectID)) {
-            dfDomain <- dfDomain %>%
-                dplyr::filter(
-                    .data$USUBJID == strSubjectID
-                )
-        }
-
-        return(dfDomain)
-    },
-    # TODO: figure out how to add new domains
-    chrDomains = c(
-        'SUBJ',
-        'STUDCOMP',
-        'LB',
-        'AE'
-    ),
-    lPlugins = list(pluginAE())
+  dfAnalysisInput,
+  dfBounds,
+  dfGroups,
+  dfMetrics,
+  dfResults,
+  fetchData,
+  # TODO: figure out how to add new domains
+  chrDomains = c(
+    'SUBJ',
+    'STUDCOMP',
+    'LB',
+    'AE'
+  ) #,
+  # lPlugins = list(pluginAE())
 )
