@@ -1,6 +1,6 @@
 library(purrr)
 library(dplyr)
-# load_all('~/dev/gsm.kri')
+load_all('~/dev/gsm.kri') # library(gsm.kri)
 load_all('~/dev/gsm.app') # library(gsm.app)
 # load_all('~/dev/gsm.ae') # library(gsm.ae)
 
@@ -65,16 +65,15 @@ run_gsm_app(
 
         return(dfDomain)
     },
-    # TODO: figure out how to add new domains
     chrDomains = c(
-        'SUBJ',
-        'DS',
-        'LB',
-        'AE'
-        #'SUBJ' = 'Subjects',
-        #'DS' = 'Disposition',
-        #'LB' = 'Labs',
-        #'AE' = 'Adverse Events'
+        #'SUBJ',
+        #'DS',
+        #'LB',
+        #'AE'
+        'SUBJ' = 'Subjects',
+        'DS' = 'Disposition',
+        'LB' = 'Labs',
+        'AE' = 'Adverse Events'
     ),
     lPlugins = list(pluginAE())
 )
