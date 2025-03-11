@@ -21,10 +21,20 @@ spec:
       type: character
     AEBODSYS:
       type: character
-    AESER:
+    aeser:
       type: character
+      source_col: AESER
     AESEV:
       type: character
+    aerel:
+      type: character
+      source_col: AEREL
+    aeout:
+      type: character
+      source_col: AEOUT
+    aeacn:
+      type: character
+      source_col: AEACN
 steps:
   # Add columns required by {gsm.ae} plugin.
   - output: Mapped_AE
@@ -38,7 +48,6 @@ steps:
           AEENDTC as aeen_dt,
           AEDECOD as mdrpt_nsv,
           AEBODSYS as mdrsoc_nsv,
-          AESER as aeser,
           AESEV as aetoxgr
         FROM df
 

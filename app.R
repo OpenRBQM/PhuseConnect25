@@ -1,5 +1,14 @@
-# library(gsm.app)
-# library(gsm.ae)
+library(purrr)
+library(dplyr)
+# load_all('~/dev/gsm.kri')
+load_all('~/dev/gsm.app') # library(gsm.app)
+# load_all('~/dev/gsm.ae') # library(gsm.ae)
+
+lAnalysisData <- 'data/Analysis' %>%
+    list.files(full.names = TRUE) %>%
+    setNames(basename(.) %>% sub('\\..*$', '', .)) %>%
+    map(readRDS)
+
 dfAnalysisInput <- lAnalysisData %>%
     imap(~
         .x$Analysis_Input %>%
@@ -7,12 +16,18 @@ dfAnalysisInput <- lAnalysisData %>%
     ) %>%
     list_rbind()
 
+lReportingData <- 'data/Reporting' %>%
+    list.files(full.names = TRUE) %>%
+    setNames(basename(.) %>% sub('\\..*$', '', .)) %>%
+    map(readRDS)
+
+# shiny::shinyApp
 run_gsm_app(
     dfAnalysisInput,
-    lReportingData$Reporting_Bounds,
-    lReportingData$Reporting_Groups,
-    lReportingData$Reporting_Metrics,
-    lReportingData$Reporting_Results,
+    lReportingData$Bounds,
+    lReportingData$Groups,
+    lReportingData$Metrics,
+    lReportingData$Results,
     function(
         strDomain,
         strSiteID = NULL,
@@ -20,14 +35,16 @@ run_gsm_app(
     ) {
         strDomain <- switch(strDomain,
             SUBJ = 'DM',
-            STUDCOMP = 'DS',
             strDomain
         )
+
         # Load data.
         dfDomain <- file.path('data', 'Mapped', paste0(strDomain, '.rds')) %>%
             readRDS() %>%
             mutate(
-                SubjectID = USUBJID
+                SubjectID = USUBJID,
+                across(ends_with('date'), as.Date),
+                across(ends_with('dt'), as.Date)
             )
 
         # Subset on site ID, if available.
@@ -51,9 +68,13 @@ run_gsm_app(
     # TODO: figure out how to add new domains
     chrDomains = c(
         'SUBJ',
-        'STUDCOMP',
+        'DS',
         'LB',
         'AE'
+        #'SUBJ' = 'Subjects',
+        #'DS' = 'Disposition',
+        #'LB' = 'Labs',
+        #'AE' = 'Adverse Events'
     ),
     lPlugins = list(pluginAE())
 )
