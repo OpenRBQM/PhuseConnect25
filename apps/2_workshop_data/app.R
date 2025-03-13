@@ -1,6 +1,6 @@
 # Launch the ShinyApp (Do not remove this comment )
 library(gsm.app)
-load_all('~/dev/gsm.ae') # library(gsm.ae)
+library(gsm.ae) # load_all('../gsm.ae')
 library(fs)
 library(purrr)
 library(dplyr)
@@ -48,8 +48,7 @@ run_gsm_app(
   dfResults,
   fetchData,
   chrDomains = c(
-    SUBJ = 'Subjects',
-    DM = "Subject Metadata",
+    SUBJ = "Subject Metadata",
     DS = "Study Disposition",
     LB = "Labs",
     AE = "Adverse Events"
