@@ -17,15 +17,19 @@ spec:
       type: character
     AESEQ:
       type: character
-    AEDECOD:
+    # Columns required by {gsm.ae} plugin:
+    mdrpt_nsv:
       type: character
-    AEBODSYS:
+      source_col: AEDECOD
+    mdrsoc_nsv:
       type: character
+      source_col: AEBODSYS
     aeser:
       type: character
       source_col: AESER
-    AESEV:
+    aetoxgr:
       type: character
+      source_col: AESEV
     aerel:
       type: character
       source_col: AEREL
@@ -36,7 +40,11 @@ spec:
       type: character
       source_col: AEACN
 steps:
-  # Add columns required by {gsm.ae} plugin.
+  # Clean adverse event data:
+  # - Create SITEID column from USUBJID.
+  # - Convert AE start and end date from character values to dates. For incomplete date values, set
+  #   to missing.
+  # - Add columns required by {gsm.ae} plugin: aest_dt, aeen_dt, mdrpt_nsv, mdrsoc_nsv, and aetoxgr.
   - output: Mapped_AE
     name: RunQuery
     params:
@@ -44,10 +52,15 @@ steps:
       strQuery: |
         SELECT *,
           SUBSTR(USUBJID, 4, 3) as SITEID,
-          AESTDTC as aest_dt,
-          AEENDTC as aeen_dt,
-          AEDECOD as mdrpt_nsv,
-          AEBODSYS as mdrsoc_nsv,
-          AESEV as aetoxgr
+          CASE
+            WHEN LENGTH(AESTDTC) = 10 THEN 
+              CAST(AESTDTC as DATE)
+            ELSE NULL
+          END AS aest_dt,
+          CASE
+            WHEN LENGTH(AEENDTC) = 10 THEN 
+              CAST(AEENDTC as DATE)
+            ELSE NULL
+          END AS aeen_dt
         FROM df
 

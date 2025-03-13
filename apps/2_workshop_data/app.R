@@ -1,6 +1,6 @@
-# Launch the ShinyApp (Do not remove this comment)
+# Launch the ShinyApp (Do not remove this comment )
 library(gsm.app)
-# library(gsm.ae)
+load_all('~/dev/gsm.ae') # library(gsm.ae)
 library(fs)
 library(purrr)
 library(dplyr)
@@ -16,6 +16,9 @@ dfMetrics <- ReadData("Reporting", "Metrics")
 dfResults <- ReadData("Reporting", "Results")
 
 fetchData <- function(strDomain, strSiteID = NULL, strSubjectID = NULL) {
+  if (strDomain == 'SUBJ')
+    strDomain <- 'DM'
+
   # Load data.
   dfDomain <- ReadData("Mapped", strDomain)
 
@@ -45,10 +48,11 @@ run_gsm_app(
   dfResults,
   fetchData,
   chrDomains = c(
-    AE = "Adverse Events",
-    LB = "Labs",
+    SUBJ = 'Subjects',
     DM = "Subject Metadata",
-    DS = "Study Disposition"
-  )
-  #lPlugins = list(pluginAE())
+    DS = "Study Disposition",
+    LB = "Labs",
+    AE = "Adverse Events"
+  ),
+  lPlugins = list(pluginAE())
 )
