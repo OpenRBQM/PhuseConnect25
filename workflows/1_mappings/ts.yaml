@@ -1,7 +1,7 @@
 meta:
   Type: Mapped
   ID: TS
-  Description: Study Metadata 
+  Description: Study Metadata
   Priority: 2
 spec:
   SDTM_TS:
@@ -24,7 +24,7 @@ spec:
 steps:
   # Select study attributes.
   - output: TS_Subset
-    name: gsm::RunQuery
+    name: gsm.core::RunQuery
     params:
       df: SDTM_TS
       strQuery: |

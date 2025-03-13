@@ -1,18 +1,18 @@
 library(purrr)
 library(dplyr)
-library(gsm)
+library(gsm.core)
 library(gsm.mapping)
 library(gsm.kri)
 library(gsm.reporting)
 library(magrittr)
-source('R/SaveData.R')
+source('R/DataIO.R')
 
 # 0. Input data
 # ----
 
 # Create a data specification from the data mapping workflows.
 lDataSpec <- CombineSpecs(
-    gsm::MakeWorkflowList(
+    gsm.core::MakeWorkflowList(
         strPath = 'workflows/1_mappings',
         strPackage = NULL
     )
@@ -34,37 +34,37 @@ lRawData <- Ingest(
 # 1. Mapped data
 # ----
 
-lMappingWorkflows <- gsm::MakeWorkflowList(
+lMappingWorkflows <- gsm.core::MakeWorkflowList(
     strPath = 'workflows/1_mappings',
     strPackage = NULL
 )
 
 lMappedData <- lMappingWorkflows %>%
-    gsm::RunWorkflows(lRawData) %T>%
+    gsm.core::RunWorkflows(lRawData) %T>%
     SaveData()
 
 # 2. Analysis Data
 # ----
 
-lAnalysisWorkflows <- gsm::MakeWorkflowList(
+lAnalysisWorkflows <- gsm.core::MakeWorkflowList(
     strPath = 'workflows/2_metrics',
     strPackage = NULL
 )
 
 lAnalysisData <- lAnalysisWorkflows %>%
-    gsm::RunWorkflows(lMappedData) %T>%
+    gsm.core::RunWorkflows(lMappedData) %T>%
     SaveData()
 
 # 3. Reporting data
 # ----
 
-lReportingWorkflows <- gsm::MakeWorkflowList(
+lReportingWorkflows <- gsm.core::MakeWorkflowList(
     strPath = 'workflows/3_reporting',
     strPackage = NULL
 )
 
 lReportingData <- lReportingWorkflows %>%
-    gsm::RunWorkflows(
+    gsm.core::RunWorkflows(
         # TODO: explain why this data object is so complicated
         c(
             lMappedData,
@@ -79,13 +79,12 @@ lReportingData <- lReportingWorkflows %>%
 # 4. Output
 # ----
 
-lModuleWorkflows <- gsm::MakeWorkflowList(
+lModuleWorkflows <- gsm.core::MakeWorkflowList(
     strPath = 'workflows/4_modules',
     strPackage = NULL
 )
 
-# TODO: figure out why report is bombing on `Widget_GroupOverview`
-gsm::RunWorkflows(
+gsm.core::RunWorkflows(
     lModuleWorkflows,
     lReportingData
 )
