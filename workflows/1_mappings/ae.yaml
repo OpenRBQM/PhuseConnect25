@@ -44,7 +44,7 @@ steps:
   # - Create SITEID column from USUBJID.
   # - Convert AE start and end date from character values to dates. For incomplete date values, set
   #   to missing.
-  # - Add columns required by {gsm.ae} plugin: aest_dt, aeen_dt, mdrpt_nsv, mdrsoc_nsv, and aetoxgr.
+  # - Add columns required by {gsm.ae} plugin: aest_dt and aeen_dt.
   - output: Mapped_AE
     name: RunQuery
     params:
