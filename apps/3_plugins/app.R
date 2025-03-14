@@ -56,6 +56,6 @@ run_gsm_app(
     DS = "Study Completion"
   ),
   lPlugins = list(pluginAE()),
-  strTitle = "Workshop Data",
+  strTitle = "Plugin Example",
   strFaviconColor = "purple"
 )
