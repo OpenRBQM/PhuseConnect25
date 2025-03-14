@@ -5,6 +5,7 @@ library(gsm.mapping)
 library(gsm.kri)
 library(gsm.reporting)
 library(magrittr)
+library(here)
 source('R/DataIO.R')
 
 # 0. Input data
